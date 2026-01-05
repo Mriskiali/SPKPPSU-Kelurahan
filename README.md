@@ -67,7 +67,7 @@ spkppsu-rawamangun/
 
 Aplikasi ini telah dideploy ke platform Vercel dan dapat diakses secara publik:
 
-**(...)**
+**(https://spkppsu-rawamangun.vercel.app/)**
 
 ---
 
@@ -170,7 +170,7 @@ Akses di browser: `http://localhost:5173`
 ## Deployment
 
 Aplikasi telah berhasil dideploy ke platform Vercel:
-*   **Alamat Akses**: [...)
+*   **Alamat Akses**: [https://spkppsu-rawamangun.vercel.app/]
 *   **Build Command**: `npm run build`
 *   **Output Directory**: `dist`
 *   **Framework**: Terdeteksi otomatis sebagai React/Vite
