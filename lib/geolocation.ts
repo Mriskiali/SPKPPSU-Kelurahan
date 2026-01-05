@@ -2,12 +2,6 @@
  * Utility functions for handling geolocation with better error messages
  */
 
-interface GeolocationErrorWithCode extends GeolocationPositionError {
-  PERMISSION_DENIED: number;
-  POSITION_UNAVAILABLE: number;
-  TIMEOUT: number;
-}
-
 /**
  * Get a detailed error message for geolocation errors
  */
@@ -15,15 +9,15 @@ export const getGeolocationErrorMessage = (error: GeolocationPositionError): str
   let errorMessage = "Gagal mendapatkan lokasi. ";
   
   switch(error.code) {
-    case error.PERMISSION_DENIED:
+    case 1: // PERMISSION_DENIED
       errorMessage += "Izin akses lokasi ditolak. Mohon aktifkan izin lokasi untuk situs ini di pengaturan browser Anda.";
       break;
-    case error.POSITION_UNAVAILABLE:
+    case 2: // POSITION_UNAVAILABLE
       errorMessage += "Informasi lokasi tidak tersedia. ";
       errorMessage += "Pastikan GPS perangkat Anda aktif, Anda mengakses situs ini melalui HTTPS atau localhost, ";
       errorMessage += "dan tidak menggunakan pemblokir lokasi seperti VPN atau jaringan perusahaan.";
       break;
-    case error.TIMEOUT:
+    case 3: // TIMEOUT
       errorMessage += "Permintaan untuk mendapatkan lokasi melewati batas waktu. Coba lagi nanti.";
       break;
     default:
@@ -50,13 +44,11 @@ export const requestGeolocation = (
   options: PositionOptions = {}
 ): void => {
   if (!navigator.geolocation) {
-    const error: GeolocationPositionError = {
+    // Create a custom error object since GeolocationPositionError is read-only
+    const error = {
       code: 2, // POSITION_UNAVAILABLE
-      message: "Geolocation tidak didukung oleh browser ini",
-      PERMISSION_DENIED: 1,
-      POSITION_UNAVAILABLE: 2,
-      TIMEOUT: 3
-    };
+      message: "Geolocation tidak didukung oleh browser ini"
+    } as GeolocationPositionError;
     errorCallback(error);
     return;
   }
