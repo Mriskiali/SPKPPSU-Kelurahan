@@ -137,9 +137,29 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
   const addReport = async (data: Omit<Report, 'id' | 'createdAt' | 'status' | 'userId' | 'userName'>, replaceId?: string) => {
     if (!auth.user) return;
     
+    let processedData = { ...data };
+    if (data.imageUrl && data.imageUrl.startsWith('blob:')) {
+      try {
+        const response = await fetch(data.imageUrl);
+        const blob = await response.blob();
+        const dataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+        processedData = { ...data, imageUrl: dataUrl };
+      } catch (error) {
+        console.error('Error converting blob URL to data URL:', error);
+        addNotification(auth.user.id, "Gagal mengonversi gambar, mungkin tidak akan muncul di laporan", 'ERROR');
+      }
+    } else {
+      processedData = { ...data };
+    }
+    
     const optimisticId = `temp-${Date.now()}`;
     const newReport: Report = {
-      ...data,
+      ...processedData,
       id: optimisticId,
       userId: auth.user.id,
       userName: auth.user.name,

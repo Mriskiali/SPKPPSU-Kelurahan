@@ -249,7 +249,17 @@ export const ManageReports: React.FC = () => {
       y += 6;
       doc.text(`Laporan Menunggu: ${filteredReports.filter(r => r.status === ReportStatus.PENDING).length}`, margin, y);
       
-      doc.save(`laporan_ppsu_${new Date().toISOString().slice(0,10)}.pdf`);
+      const pdfBlob = doc.output('blob');
+      const url = URL.createObjectURL(pdfBlob);
+      
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `laporan_ppsu_${new Date().toISOString().slice(0,10)}.pdf`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      
+      URL.revokeObjectURL(url);
     }
   };
 

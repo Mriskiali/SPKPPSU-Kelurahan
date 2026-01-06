@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { getGeolocationErrorMessage, requestGeolocation } from '../lib/geolocation';
 
 interface Location {
   display_name: string;
@@ -24,14 +25,9 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
   const [loading, setLoading] = useState(false);
 
   const getLocation = () => {
-    if (!navigator.geolocation) {
-      alert("Geolocation tidak didukung oleh browser Anda.");
-      return;
-    }
-
     setLoading(true);
     
-    navigator.geolocation.getCurrentPosition(
+    requestGeolocation(
       (position) => {
         const locationString = `${position.coords.latitude.toFixed(6)}, ${position.coords.longitude.toFixed(6)}`;
         
@@ -51,29 +47,8 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
         setLoading(false);
         console.error("Error getting location:", error);
         
-        let errorMessage = "Gagal mendapatkan lokasi. ";
-        
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-            errorMessage += "Izin akses lokasi ditolak. Mohon aktifkan izin lokasi untuk situs ini.";
-            break;
-          case error.POSITION_UNAVAILABLE:
-            errorMessage += "Informasi lokasi tidak tersedia. Pastikan GPS perangkat Anda aktif.";
-            break;
-          case error.TIMEOUT:
-            errorMessage += "Permintaan untuk mendapatkan lokasi melewati batas waktu.";
-            break;
-          default:
-            errorMessage += "Terjadi kesalahan yang tidak diketahui.";
-            break;
-        }
-        
+        const errorMessage = getGeolocationErrorMessage(error);
         alert(errorMessage);
-      },
-      {
-        enableHighAccuracy: true,
-        timeout: 15000,
-        maximumAge: 60000
       }
     );
   };
@@ -108,6 +83,11 @@ const LocationAutocomplete: React.FC<LocationAutocompleteProps> = ({
       {/* Informasi bahwa user bisa menggunakan tombol untuk lokasi saat ini */}
       <div className="text-xs text-gray-500 mt-1 italic">
         Gunakan tombol untuk mendapatkan lokasi GPS Anda saat ini
+        {(!window.isSecureContext && location.protocol !== 'https:' && location.hostname !== 'localhost') && (
+          <div className="text-xs text-orange-600 mt-1">
+            *Lokasi saat ini hanya tersedia di situs yang aman (HTTPS atau localhost)
+          </div>
+        )}
       </div>
     </div>
   );

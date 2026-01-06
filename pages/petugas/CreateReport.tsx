@@ -3,6 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useApp } from '../../context/AppContext';
 import { ReportCategory } from '../../types';
 import MapPicker from '../../components/MapPicker';
+import { compressImage, getDataUrlSize } from '../../utils/helpers';
 import { Camera, MapPin, Send, AlertCircle, X, Check, Crosshair, Link as LinkIcon, Image as ImageIcon, Trash2, Map as MapIcon } from 'lucide-react';
 
 export const CreateReport: React.FC<{ navigate: (p: string) => void }> = ({ navigate }) => {
@@ -23,6 +24,15 @@ export const CreateReport: React.FC<{ navigate: (p: string) => void }> = ({ navi
   });
 
   const [imageUrlInput, setImageUrlInput] = useState('');
+
+  const fileToBase64 = (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.readAsDataURL(file);
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = error => reject(error);
+    });
+  };
 
   const [errors, setErrors] = useState<{
       description?: string;
@@ -91,7 +101,7 @@ export const CreateReport: React.FC<{ navigate: (p: string) => void }> = ({ navi
       }
   };
 
-  const capturePhoto = () => {
+  const capturePhoto = async () => {
       if (videoRef.current) {
           const canvas = document.createElement('canvas');
           canvas.width = videoRef.current.videoWidth;
@@ -99,9 +109,34 @@ export const CreateReport: React.FC<{ navigate: (p: string) => void }> = ({ navi
           const ctx = canvas.getContext('2d');
           if (ctx) {
               ctx.drawImage(videoRef.current, 0, 0);
-              const url = canvas.toDataURL('image/jpeg');
-              setForm(prev => ({ ...prev, image: url }));
-              setErrors(prev => ({ ...prev, image: undefined }));
+              let url = canvas.toDataURL('image/jpeg', 0.7);
+              
+              try {
+                  let compressedUrl = await compressImage(url, 600, 450, 0.6);
+                  
+                  const sizeInBytes = getDataUrlSize(compressedUrl);
+                  if (sizeInBytes > (500 * 1024)) {
+                      compressedUrl = await compressImage(url, 400, 300, 0.5);
+                  }
+                  
+                  const sizeAfterCompression = getDataUrlSize(compressedUrl);
+                  if (sizeAfterCompression > (200 * 1024)) {
+                      compressedUrl = await compressImage(url, 300, 225, 0.4);
+                  }
+                  
+                  const sizeAfterSecondCompression = getDataUrlSize(compressedUrl);
+                  if (sizeAfterSecondCompression > (100 * 1024)) {
+                      compressedUrl = await compressImage(url, 200, 150, 0.3);
+                  }
+                  
+                  setForm(prev => ({ ...prev, image: compressedUrl }));
+                  setErrors(prev => ({ ...prev, image: undefined }));
+              } catch (error) {
+                  console.error('Error compressing captured image:', error);
+                  setForm(prev => ({ ...prev, image: url }));
+                  setErrors(prev => ({ ...prev, image: undefined }));
+              }
+              
               stopCamera();
           }
       }
@@ -115,17 +150,30 @@ export const CreateReport: React.FC<{ navigate: (p: string) => void }> = ({ navi
       setShowCamera(false);
   };
 
-  const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const url = URL.createObjectURL(file);
-      setForm(prev => ({ ...prev, image: url }));
-      setErrors(prev => ({ ...prev, image: undefined }));
+      try {
+        const dataUrl = await fileToBase64(file);
+        setForm(prev => ({ ...prev, image: dataUrl }));
+        setErrors(prev => ({ ...prev, image: undefined }));
+      } catch (error) {
+        console.error('Error converting file to base64:', error);
+        const url = URL.createObjectURL(file);
+        setForm(prev => ({ ...prev, image: url }));
+        setErrors(prev => ({ ...prev, image: undefined }));
+        setTimeout(() => URL.revokeObjectURL(url), 3600000);
+      }
     }
   };
 
   const handleUrlSubmit = () => {
       if (imageUrlInput) {
+          if (imageUrlInput.startsWith('blob:')) {
+              alert('Blob URLs tidak didukung. Harap gunakan URL gambar langsung atau unggah berkas gambar.');
+              return;
+          }
+          
           setForm(prev => ({ ...prev, image: imageUrlInput }));
           setErrors(prev => ({ ...prev, image: undefined }));
           setShowUrlInput(false);
