@@ -109,10 +109,21 @@ export const CreateReport: React.FC<{ navigate: (p: string) => void }> = ({ navi
           const ctx = canvas.getContext('2d');
           if (ctx) {
               ctx.drawImage(videoRef.current, 0, 0);
-              const url = canvas.toDataURL('image/jpeg');
+              let url = canvas.toDataURL('image/jpeg', 0.7);
               
               try {
-                  const compressedUrl = await compressImage(url);
+                  let compressedUrl = await compressImage(url, 800, 600, 0.7);
+                  
+                  const sizeInBytes = atob(compressedUrl.split(',')[1]).length;
+                  if (sizeInBytes > (2 * 1024 * 1024)) {
+                      compressedUrl = await compressImage(url, 600, 450, 0.6);
+                  }
+                  
+                  const sizeAfterFirstCompression = atob(compressedUrl.split(',')[1]).length;
+                  if (sizeAfterFirstCompression > (1 * 1024 * 1024)) {
+                      compressedUrl = await compressImage(url, 400, 300, 0.5);
+                  }
+                  
                   setForm(prev => ({ ...prev, image: compressedUrl }));
                   setErrors(prev => ({ ...prev, image: undefined }));
               } catch (error) {
