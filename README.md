@@ -10,24 +10,24 @@ Aplikasi web berbasis **React & Supabase** yang dirancang untuk mendigitalkan pr
 ## Fitur Unggulan
 
 ### Modul Petugas (Mobile First)
-*   ** Absensi & Lokasi Real-time**: Menggunakan **Leaflet Maps** & GPS bawaan HP untuk mendeteksi lokasi kerja secara akurat (Reverse Geocoding: Koordinat -> Nama Jalan).
-*   ** Laporan Visual**: Ambil foto langsung dari kamera aplikasi atau upload dari galeri.
-*   ** Perbaikan Laporan (Resubmit)**: Fitur "Perbaiki & Kirim Ulang" untuk laporan yang ditolak admin, tanpa perlu mengetik ulang data dari awal.
-*   ** Manajemen Profil Mandiri**: Edit foto profil (disimpan sebagai Base64) dan ubah kata sandi dengan aman.
-*   ** Riwayat & Filter**: Timeline laporan yang dikelompokkan per tanggal dengan filter status/kategori.
+*   **Absensi & Lokasi Real-time**: Menggunakan **Leaflet Maps** & GPS bawaan HP untuk mendeteksi lokasi kerja secara akurat (Reverse Geocoding: Koordinat -> Nama Jalan).
+*   **Laporan Visual**: Ambil foto langsung dari kamera aplikasi atau upload dari galeri.
+*   **Perbaikan Laporan (Resubmit)**: Fitur "Perbaiki & Kirim Ulang" untuk laporan yang ditolak admin, tanpa perlu mengetik ulang data dari awal.
+*   **Manajemen Profil Mandiri**: Edit foto profil (disimpan sebagai Base64) dan ubah kata sandi dengan aman.
+*   **Riwayat & Filter**: Timeline laporan yang dikelompokkan per tanggal dengan filter status/kategori.
 
 ###  Modul Admin (Dashboard)
-*   ** Dashboard Analitik Lanjutan**: Statistik kinerja total, grafik batang, dan "Leaderboard" petugas paling rajin dengan tampilan tab-based untuk navigasi antar fungsi.
-*   ** Verifikasi Laporan**:
+*   **Dashboard Analitik Lanjutan**: Statistik kinerja total, grafik batang, dan "Leaderboard" petugas paling rajin dengan tampilan tab-based untuk navigasi antar fungsi.
+*   **Verifikasi Laporan**:
     *   List view responsif (nyaman di Desktop & Mobile).
     *   Filter canggih: Berdasarkan Petugas, Tanggal, dan Status.
     *   Modal Detail: Lihat bukti foto resolusi penuh & peta lokasi.
     *   **Tolak dengan Alasan**: Memberikan feedback spesifik kenapa laporan ditolak.
-*   ** Manajemen User**:
+*   **Manajemen User**:
     *   CRUD Petugas (Tambah, Edit, Nonaktifkan).
     *   **Hapus Permanen (Hard Delete)**: Menghapus akun beserta seluruh riwayat laporannya dari database (Safety Confirmation).
-*   ** Ekspor Data**: Download rekap laporan ke format `.csv` dan `.pdf` untuk arsip kelurahan.
-*   ** Statistik & Analitik**: Tampilan visual statistik laporan berdasarkan status dan kategori bawaan, serta kinerja petugas dalam bentuk grafik dan tabel.
+*   **Ekspor Data**: Download rekap laporan ke format `.csv` dan `.pdf` untuk arsip kelurahan.
+*   **Statistik & Analitik**: Tampilan visual statistik laporan berdasarkan status dan kategori bawaan, serta kinerja petugas dalam bentuk grafik dan tabel.
 
 ---
 
